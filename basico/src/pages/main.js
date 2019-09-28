@@ -6,11 +6,16 @@ import { View,
   StyleSheet,
   Linking,
 } from 'react-native';
+
 import api from '../services/api';
 
 export default class Main extends Component {
   static navigationOptions = {
     title: 'Shilton',
+    headerTitleStyle: {
+      textAlign: 'center',
+      flex: 1,
+    },
   };
 
   state = {
@@ -100,17 +105,16 @@ const styles = StyleSheet.create({
   btn_lista: {
     height: 42,
     borderRadius: 5,
-    borderWidth: 2,
+    borderWidth: 20,
     borderColor: '#7159c1',
-    backgroundColor: 'transparent',
+    backgroundColor: '#7159c1',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
-
   },
   txtbtn: {
     fontSize: 16,
-    color: '#7159c1',
+    color: 'white',
     fontWeight: 'bold',
   },
 });
