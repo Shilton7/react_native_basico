@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Linking} from 'react-native';
+import { View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Linking,
+} from 'react-native';
 import api from '../services/api';
 
 export default class Main extends Component {
@@ -8,30 +14,45 @@ export default class Main extends Component {
   };
 
   state = {
+    infoProdutos: {},
     docs: [],
+    pagina: 1,
   };
 
   componentDidMount() {
-    this.loadLotes();
+    this.loadProdutos();
   }
+
+  loadProdutos = async (pagina = 1) => {
+    const response = await api.get(`/products?page=${pagina}`);
+    const {docs, ...infoProdutos} = response.data;
+
+    this.setState({
+      docs: [...this.state.docs, ...docs],
+      infoProdutos,
+      pagina,
+    });
+  };
+
+  carregaMais = () => {
+    const {pagina, infoProdutos} = this.state;
+    if (pagina === infoProdutos.pages) return;
+
+    const numPagina = pagina + 1;
+    this.loadProdutos(numPagina);
+  };
 
   renderItem = ({item}) => (
     <View style={styles.containerProdutos}>
       <Text style={styles.titulo_item}>{item.title}</Text>
       <Text style={styles.desc_item}>{item.description}</Text>
-      <TouchableOpacity style={styles.btn_lista} onPress={() => Linking.openURL(item.url)}>
+      <TouchableOpacity
+        onPress={() => Linking.openURL(item.url)}
+        style={styles.btn_lista}>
         <Text style={styles.txtbtn}>Acessar</Text>
       </TouchableOpacity>
     </View>
-  )
-
-  loadLotes = async () => {
-    const response = await api.get("products");
-    const {docs} = response.data;
-    console.log(docs);
-
-    this.setState({docs});
-  };
+  );
 
   render() {
     return (
@@ -41,6 +62,8 @@ export default class Main extends Component {
           data={this.state.docs}
           keyExtractor={item => item._id}
           renderItem={this.renderItem}
+          onEndReached={this.carregaMais} //aciona ao chegar no final da lista
+          onEndReachedThreshold={0.1} //percentual do fim pra carregar os proximos itens
         />
       </View>
     );
@@ -50,44 +73,44 @@ export default class Main extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1, //ocupar tela toda
-    backgroundColor: "#fafafa"
+    backgroundColor: '#fafafa',
   },
   listagem: {
-    padding: 20
+    padding: 20,
   },
   containerProdutos: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: "#DDD",
+    borderColor: '#DDD',
     borderRadius: 5,
     padding: 20,
-    marginBottom: 20
+    marginBottom: 20,
   },
   titulo_item: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#333"
+    fontWeight: 'bold',
+    color: '#333',
   },
   desc_item: {
     fontSize: 14,
-    color: "#999",
+    color: '#999',
     marginTop: 5,
-    lineHeight: 24
+    lineHeight: 24,
   },
   btn_lista: {
     height: 42,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: "#7159c1",
-    backgroundColor: "transparent",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 10
+    borderColor: '#7159c1',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
 
   },
   txtbtn: {
     fontSize: 16,
-    color: "#7159c1",
-    fontWeight: "bold"
-  }
+    color: '#7159c1',
+    fontWeight: 'bold',
+  },
 });
